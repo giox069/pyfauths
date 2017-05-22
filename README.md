@@ -16,3 +16,6 @@ GPLv3
 * Putting a cleartext password on the commandline is considered to be not secure.
 * This script currently does not verify certificate and is not protected from simple MITM SSL attacks to discover the password
 
+## Compatibility
+* Tested on ubuntu 16.04 against Fireware OS 11.11.4
+* Does not work on MacOS Sierra, because the installed python 2.7.10 is linked to an old openssl library. You can try to workaround it installing an updated python via [Homebrew](https://brew.sh/)
