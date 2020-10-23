@@ -1,7 +1,8 @@
 # pyfauths.py
 
-This is a python script which emulates a user authenticating to a WatchGuard Fireware OS https portal on port 4100.
+This is a python2 script which emulates a user authenticating to a WatchGuard Fireware OS https portal on port 4100.
 It's useful when you cannot use the Watchguard provided authentication or SSO methods, for example when you need to authenticate from a script.
+A newer python3 version is available on the master branch.
 
 ## Usage example
 ```
