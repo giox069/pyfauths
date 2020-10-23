@@ -5,7 +5,15 @@ It's useful when you cannot use the Watchguard provided authentication or SSO me
 
 ## Usage example
 ```
+./pyfauths.py mywgaddress.mydom.dom login Firebox-DB john
+```
+Or you can type the password directy on the commandline:
+
+```
 ./pyfauths.py mywgaddress.mydom.dom login Firebox-DB john itspassword
+```
+To logout:
+```
 ./pyfauths.py mywgaddress.mydom.dom logout
 ```
 

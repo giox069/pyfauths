@@ -18,6 +18,7 @@ import ssl
 import urllib.request
 import argparse
 import sys
+from getpass import getpass
 
 
 # -----------------
@@ -97,10 +98,14 @@ def FirewarePost(fwaddr, postparams):
 	return rc
 
 def FirewareLogin(args):
+	if len(args.password) == 0:
+	    password = getpass()
+	else:
+	    password = args.password[0]
 	postparams = PARAMSLOGIN
 	postparams['fw_domain'] = args.domain
 	postparams['fw_username'] = args.username
-	postparams['fw_password'] = args.password
+	postparams['fw_password'] = password
 	return FirewarePost(args.fwaddress, postparams)
 
 def FirewareLogout(args):
@@ -115,7 +120,7 @@ subparsers = parser.add_subparsers(help='sub-command help')
 logon_parser = subparsers.add_parser('login', help='Login to firebox')
 logon_parser.add_argument('domain', help="Domain. Use 'Firebox-DB' to logon as Firebox user")
 logon_parser.add_argument('username', help='Username')
-logon_parser.add_argument('password', help='password')
+logon_parser.add_argument('password', nargs='*', help='password')
 logon_parser.set_defaults(func=FirewareLogin)
 
 logoff_parser = subparsers.add_parser('logout', help='Logout from firebox')
