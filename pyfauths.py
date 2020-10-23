@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 # PYFAUTHS A WatchGuard Fireware portal https authentication script
 # Copyright (c) 2017, Giovanni Panozzo https://github.com/giox069
@@ -14,7 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import urllib, urllib2, ssl
+import ssl
+import urllib.request
 import argparse
 import sys
 
@@ -40,9 +41,9 @@ PARAMSLOGOUT = {
 	'fw_logon_type': 'logout'
 }
 
-class NoRedirectHandler(urllib2.HTTPRedirectHandler):
+class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
 	def http_error_302(self, req, fp, code, msg, headers):
-		infourl = urllib.addinfourl(fp, headers, req.get_full_url())
+		infourl = urllib.request.addinfourl(fp, headers, req.get_full_url())
 		infourl.status = code
 		infourl.code = code
 		return infourl
@@ -56,40 +57,41 @@ def FirewarePost(fwaddr, postparams):
 	ctx.check_hostname = False
 	ctx.verify_mode = ssl.CERT_NONE
 
-	h = urllib2.HTTPSHandler(context=ctx)
-	opener = urllib2.build_opener(h, NoRedirectHandler())
-	data = urllib.urlencode(postparams)
+	h = urllib.request.HTTPSHandler(context=ctx)
+	opener = urllib.request.build_opener(h, NoRedirectHandler())
+	data = urllib.parse.urlencode(postparams)
+	data = data.encode('utf-8')
 
 	url = WGURL % (fwaddr)
-	request = urllib2.Request(url, data=data)
+	request = urllib.request.Request(url, data=data)
 	request.add_header('Content-type', 'application/x-www-form-urlencoded')
 	request.add_header('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
 	request.get_method = lambda: "POST"
 	con = opener.open(request)
 
 	if "success.shtml" in con.headers['location']:
-		print "Successfully logged in"
+		print("Successfully logged in")
 		rc = True
 	elif "=501" in con.headers['location']:
-		print "Authentication failed: invalid credentials"
+		print("Authentication failed: invalid credentials")
 		rc = False
 	elif "=502" in con.headers['location']:
-		print "Successfully logged out"
+		print("Successfully logged out")
 		rc = True
 	elif "=503" in con.headers['location']:
-		print "Seession expired"
+		print("Seession expired")
 		rc = False
 	elif "=504" in con.headers['location']:
-		print "Timeout"
+		print("Timeout")
 		rc = False
 	elif "=505" in con.headers['location']:
-		print "Authentication failed: User is already logged in from another host."
+		print("Authentication failed: User is already logged in from another host.")
 		rc = False
 	elif "=506" in con.headers['location']:
-		print "Invalid logon type"
+		print("Invalid logon type")
 		rc = False
 	else:
-		print "Unable to understand response from https server"
+		print("Unable to understand response from https server")
 		rc = False
 
 	return rc
@@ -120,6 +122,10 @@ logoff_parser = subparsers.add_parser('logout', help='Logout from firebox')
 logoff_parser.set_defaults(func=FirewareLogout)
 
 args = parser.parse_args()
+
+if not 'func' in args:
+    print("Nothing to do")
+    sys.exit(1)
 
 if args.func(args):
 	sys.exit(0)
